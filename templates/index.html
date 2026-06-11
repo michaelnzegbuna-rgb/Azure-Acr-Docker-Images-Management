@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure ACR & Container Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="logo-area">
+                <div class="logo-glow"></div>
+                <svg class="azure-logo" viewBox="0 0 23.3 23" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 17.583L5.3 7l8.28 11.233H0z" fill="#0078d4"/>
+                    <path d="M12.7 3.3L18.4 12l4.9 6.2H10.1l2.6-14.9z" fill="#50e6ff"/>
+                </svg>
+                <div class="title-group">
+                    <h1>Azure ACR Portal</h1>
+                    <p class="subtitle">Docker Image Lifecycle & Container Management Program</p>
+                </div>
+            </div>
+            <div class="status-badge">
+                <span class="pulse-dot"></span>
+                <span class="status-text">Live on ACI (westeurope)</span>
+            </div>
+        </header>
+
+        <!-- DYNAMIC STATS GRID -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🕒</div>
+                <div class="stat-info">
+                    <span class="stat-label">Container Uptime</span>
+                    <h2 class="stat-val" id="uptime-val">{{ uptime }}</h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-info">
+                    <span class="stat-label">Total HTTP Requests</span>
+                    <h2 class="stat-val" id="req-val">{{ req_count }}</h2>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-info">
+                    <span class="stat-label">Container Health Status</span>
+                    <div class="progress-container">
+                        <div class="progress-label">CPU Usage: <span id="cpu-pct">0%</span></div>
+                        <div class="progress-bar"><div class="progress-fill" id="cpu-bar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-label">Memory: <span id="mem-pct">0%</span></div>
+                        <div class="progress-bar"><div class="progress-fill" id="mem-bar" style="width: 0%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN GRID Layout -->
+        <div class="main-grid">
+            <!-- SIDE NAVIGATION -->
+            <nav class="side-nav">
+                <button class="nav-btn active" onclick="switchTab('overview')">
+                    <span class="btn-icon">💡</span> Overview
+                </button>
+                <button class="nav-btn" onclick="switchTab('architecture')">
+                    <span class="btn-icon">⚙️</span> Containers vs VMs
+                </button>
+                <button class="nav-btn" onclick="switchTab('skus')">
+                    <span class="btn-icon">📦</span> Azure ACR SKUs
+                </button>
+                <button class="nav-btn" onclick="switchTab('rbac')">
+                    <span class="btn-icon">🔒</span> Access Control (RBAC)
+                </button>
+                <button class="nav-btn" onclick="switchTab('lifecycle')">
+                    <span class="btn-icon">🚀</span> Image Lifecycle Log
+                </button>
+            </nav>
+
+            <!-- TAB CONTENT -->
+            <main class="content-panel">
+                <!-- OVERVIEW TAB -->
+                <article id="overview" class="tab-content active">
+                    <h2>Welcome to the Containerized Portfolio</h2>
+                    <p class="intro-p">This Flask application runs inside an <strong>Azure Container Instances (ACI)</strong> container, pulled directly from a private <strong>Azure Container Registry (ACR)</strong> repository.</p>
+                    
+                    <div class="info-grid">
+                        <div class="card-glass">
+                            <h3>Registry Meta</h3>
+                            <ul class="meta-list">
+                                <li><strong>Registry Name:</strong> <code>learnacrolamc</code></li>
+                                <li><strong>Registry SKU:</strong> <code>Basic</code></li>
+                                <li><strong>Login Server:</strong> <code>learnacrolamc.azurecr.io</code></li>
+                                <li><strong>Image Repos:</strong> <code>flask-acr-app</code></li>
+                                <li><strong>Image Tags:</strong> <code>v1.0</code>, <code>v2.0</code>, <code>v3.0</code>, <code>v4.0</code></li>
+                            </ul>
+                        </div>
+                        <div class="card-glass">
+                            <h3>ACI Meta</h3>
+                            <ul class="meta-list">
+                                <li><strong>Instance Name:</strong> <code>flask-acr-demo</code></li>
+                                <li><strong>DNS FQDN:</strong> <code>flaskacrdemo2026leye.westeurope...</code></li>
+                                <li><strong>Host OS:</strong> Linux (Alpine/Debian Slim)</li>
+                                <li><strong>Allocated CPU:</strong> 1.0 Core</li>
+                                <li><strong>Allocated Mem:</strong> 1.0 GB</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- ARCHITECTURE TAB -->
+                <article id="architecture" class="tab-content">
+                    <h2>Container Architecture vs. Virtual Machines</h2>
+                    <p>Understanding how virtualization differs at the OS level versus the Hypervisor level is core to container orchestration.</p>
+                    
+                    <div class="comparison-table-wrapper">
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <th>Containers (e.g. Docker)</th>
+                                    <th>Virtual Machines (VMs)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Virtualization Level</strong></td>
+                                    <td>Operating System level (Shares host kernel)</td>
+                                    <td>Hardware level (Includes guest OS)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Weight & Startup</strong></td>
+                                    <td>Lightweight (seconds, megabytes)</td>
+                                    <td>Heavyweight (minutes, gigabytes)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Isolation</strong></td>
+                                    <td>Process-level isolation (Namespaces, Cgroups)</td>
+                                    <td>Strong hardware-level isolation (Hypervisor)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Efficiency</strong></td>
+                                    <td>High density, near-zero overhead</td>
+                                    <td>Lower density, performance overhead</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="diagram-section">
+                        <h3>Understanding Image Layers</h3>
+                        <p>Docker images are constructed using read-only layers. Each instruction in a Dockerfile creates a new layer. This layout allows layer caching, reducing build times and network transfers.</p>
+                        <div class="layer-stack">
+                            <div class="stack-layer layer-app">Writable Container Layer (App States, Logs)</div>
+                            <div class="stack-layer layer-cmd">CMD ["gunicorn", "app:app"] (Layer 4)</div>
+                            <div class="stack-layer layer-copy">COPY . /app (Layer 3)</div>
+                            <div class="stack-layer layer-install">RUN pip install -r requirements.txt (Layer 2)</div>
+                            <div class="stack-layer layer-base">FROM python:3.11-slim (Base Layer 1)</div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- SKUS TAB -->
+                <article id="skus" class="tab-content">
+                    <h2>Azure Container Registry SKUs</h2>
+                    <p>ACR is available in three primary service tiers (SKUs) designed to scale with deployment size and operational complexity.</p>
+                    
+                    <div class="sku-cards">
+                        <div class="sku-card selected">
+                            <div class="sku-badge">Active</div>
+                            <h3>Basic</h3>
+                            <div class="sku-price">Cost-Optimized</div>
+                            <p class="sku-desc">Perfect for development, testing, and small workloads.</p>
+                            <ul>
+                                <li>10 GB Storage</li>
+                                <li>Basic Authentication</li>
+                                <li>Standard rate limits</li>
+                            </ul>
+                        </div>
+                        <div class="sku-card">
+                            <h3>Standard</h3>
+                            <div class="sku-price">Workload Ready</div>
+                            <p class="sku-desc">Best for production environments and team collaboration.</p>
+                            <ul>
+                                <li>100 GB Storage</li>
+                                <li>Increased transfer speeds</li>
+                                <li>Standard billing rates</li>
+                            </ul>
+                        </div>
+                        <div class="sku-card">
+                            <h3>Premium</h3>
+                            <div class="sku-price">Enterprise Tier</div>
+                            <p class="sku-desc">Maximum scaling, geo-replication, and advanced security.</p>
+                            <ul>
+                                <li>500 GB Storage</li>
+                                <li>Geo-Replication</li>
+                                <li>Azure Private Link (VNet support)</li>
+                                <li>Customer-managed keys</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- RBAC TAB -->
+                <article id="rbac" class="tab-content">
+                    <h2>Access Control & Security (RBAC)</h2>
+                    <p>Azure utilizes Role-Based Access Control (RBAC) to enforce the principle of least privilege when interacting with ACR.</p>
+                    
+                    <div class="rbac-grid">
+                        <div class="rbac-item">
+                            <div class="rbac-role-name">Owner / Contributor</div>
+                            <p>Full access to manage the registry, including creating or deleting the registry instance itself and modifying admin credentials.</p>
+                        </div>
+                        <div class="rbac-item push">
+                            <div class="rbac-role-name">AcrPush</div>
+                            <p>Grants permissions to build, tag, and push container images. Typically assigned to CI/CD pipelines (e.g., GitHub Actions, Azure DevOps).</p>
+                        </div>
+                        <div class="rbac-item pull">
+                            <div class="rbac-role-name">AcrPull</div>
+                            <p>Grants read access to search and pull container images. Assigned to hosting environments (ACI, AKS, Web Apps) to secure deployment workflows.</p>
+                        </div>
+                        <div class="rbac-item delete">
+                            <div class="rbac-role-name">AcrDelete</div>
+                            <p>Allows deletion of image repositories or specific tag manifests. Assigned to clean-up scripts or administrators.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- LIFECYCLE TAB -->
+                <article id="lifecycle" class="tab-content">
+                    <h2>Container Image Lifecycle Log</h2>
+                    <p>Below are the actual build and deploy logs generated during the deployment of this web app using cloud-build (ACR Tasks).</p>
+                    
+                    <div class="terminal-panel">
+                        <div class="terminal-header">
+                            <span class="term-dot red"></span>
+                            <span class="term-dot yellow"></span>
+                            <span class="term-dot green"></span>
+                            <span class="term-title">Bash Console</span>
+                        </div>
+                        <div class="terminal-body">
+<span class="c-prompt">user@azure-cli:~$</span> az acr build --registry learnacrolamc --image flask-acr-app:v4.0 .
+<span class="c-log">Packing source code into tar to upload...
+Uploading 145.2 KiB to learnacrolamc.azurecr.io/flask-acr-app...
+Sending build context to ACR builder...
+2026/06/10 12:55:02 Entering context...
+2026/06/10 12:55:03 Step 1/7 : FROM python:3.11-slim
+3.11-slim: Pulling from library/python
+...
+Status: Downloaded newer image for python:3.11-slim
+2026/06/10 12:55:12 Step 2/7 : WORKDIR /app
+2026/06/10 12:55:13 Step 3/7 : COPY requirements.txt .
+2026/06/10 12:55:14 Step 4/7 : RUN pip install --no-cache-dir -r requirements.txt
+Collecting Flask==3.0.3
+  Downloading Flask-3.0.3-py3-none-any.whl (101 kB)
+Collecting gunicorn==22.0.0
+  Downloading gunicorn-22.0.0-py3-none-any.whl (84 kB)
+Installing collected packages: gunicorn, Flask
+Successfully installed Flask-3.0.3 gunicorn-22.0.0
+2026/06/10 12:55:20 Step 5/7 : COPY . .
+2026/06/10 12:55:21 Step 6/7 : EXPOSE 80
+2026/06/10 12:55:22 Step 7/7 : CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:app"]
+v4.0: digest: sha256:4f1e0958197771239aa8123... size: 1374
+2026/06/10 12:55:28 Image 'flask-acr-app:v4.0' built successfully.
+Build logs stored in registry task history.</span>
+<span class="c-prompt">user@azure-cli:~$</span> az container create --resource-group acr-learning-rg --name flask-acr-demo --image learnacrolamc.azurecr.io/flask-acr-app:v4.0 --dns-name-label flaskacrdemo2026leye --ports 80
+<span class="c-success">Container group 'flask-acr-demo' successfully provisioned and started. State: Running.</span>
+                        </div>
+                    </div>
+                </article>
+            </main>
+        </div>
+
+        <!-- FOOTER -->
+        <footer class="footer-bar">
+            <div><strong>Registry:</strong> learnacrolamc.azurecr.io | <strong>SKU:</strong> Basic | <strong>Region:</strong> westeurope</div>
+            <div>Assignment 11 Submission Repository</div>
+        </footer>
+    </div>
+
+    <!-- METRICS POLLER JS -->
+    <script>
+        function switchTab(tabId) {
+            // Remove active classes
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Find clicking element index to set active button
+            const clickedBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => btn.innerText.toLowerCase().includes(tabId));
+            if (clickedBtn) clickedBtn.classList.add('active');
+            
+            // Set active tab content
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Poll flask server metrics API every 2.5 seconds
+        async function fetchMetrics() {
+            try {
+                const response = await fetch('/api/metrics');
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Update text elements
+                    document.getElementById('uptime-val').innerText = data.uptime;
+                    document.getElementById('req-val').innerText = data.req_count;
+                    
+                    // Update progress bars
+                    document.getElementById('cpu-pct').innerText = data.cpu + '%';
+                    document.getElementById('cpu-bar').style.width = data.cpu + '%';
+                    
+                    document.getElementById('mem-pct').innerText = data.memory + '%';
+                    document.getElementById('mem-bar').style.width = data.memory + '%';
+                }
+            } catch (err) {
+                console.error("Error polling metrics: ", err);
+            }
+        }
+
+        // Start polling
+        setInterval(fetchMetrics, 2500);
+        // Initial load
+        fetchMetrics();
+    </script>
+</body>
+</html>
