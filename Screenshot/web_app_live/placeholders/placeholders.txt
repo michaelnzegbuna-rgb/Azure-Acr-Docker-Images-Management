@@ -1,0 +1,6 @@
+Place your screenshots in this folder.
+Recommended screenshots:
+1. local_docker_build.png - Screenshot of a successful local docker build.
+2. azure_acr_portal.png - Screenshot of the Azure Portal showing the 'learnacrolamc' container registry repositories and the 'v4.0' tag.
+3. azure_aci_portal.png - Screenshot of the Azure Portal showing the 'flask-acr-demo' Container Instance running with status 'Running' and public FQDN.
+4. web_app_live.png - Screenshot of the live web app dashboard running in the browser at the public URL.
