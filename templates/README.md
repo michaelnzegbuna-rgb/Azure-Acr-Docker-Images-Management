@@ -1,56 +1,65 @@
-# Azure Container Registry (ACR) & Docker Image Management Learning Program
+# Azure Container Registry (ACR) and Docker Image Management Project
 
-This repository contains the source code, container configuration, deployment process, and verification evidence for the Azure Container Registry (ACR) and Docker Image Management assignment.
+This repository contains the application source code, Docker configuration files, deployment procedures, and validation evidence developed as part of the Azure Container Registry (ACR) and Docker Image Management assignment.
 
 ---
 
-## 📋 Submission Requirements Mapping
+## 📌 Assignment Deliverables Overview
 
-To assist with evaluation, the table below maps each assignment deliverable to its corresponding section within this repository.
+The table below provides a clear mapping between the required assessment deliverables and their corresponding sections within this repository.
 
-| Deliverable                    | Description                                                          | Location in Repository                                |
-| ------------------------------ | -------------------------------------------------------------------- | ----------------------------------------------------- |
-| **1. Registry Details**        | Azure Container Registry name, SKU, and configuration details        | [Registry Details](#1-registry-details)               |
-| **2. Dockerfile**              | Container image build configuration                                  | [Dockerfile](#2-dockerfile)                           |
-| **3. Deployment Verification** | Evidence of successful image push to Azure Container Registry        | [Deployment Verification](#3-deployment-verification) |
-| **4. Proof of Execution**      | Verification of the running application in Azure Container Instances | [Proof of Execution](#4-proof-of-execution)           |
-| **5. Documentation**           | Image tagging strategy and Azure RBAC role assignments               | [Documentation](#5-documentation)                     |
+| Deliverable                     | Description                                                                        | Repository Section                                    |
+| ------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **Registry Information**        | Details of the Azure Container Registry, including its name and service tier       | [Registry Details](#1-registry-details)               |
+| **Docker Configuration**        | Dockerfile used to build the container image                                       | [Dockerfile](#2-dockerfile)                           |
+| **Deployment Validation**       | Evidence confirming the successful upload of the image to ACR                      | [Deployment Verification](#3-deployment-verification) |
+| **Application Execution Proof** | Confirmation that the application is actively running in Azure Container Instances | [Proof of Execution](#4-proof-of-execution)           |
+| **Project Documentation**       | Explanation of image versioning practices and Azure RBAC role assignments          | [Documentation](#5-documentation)                     |
 
 ---
 
 ## 1. Registry Details
 
-The Azure Container Registry used for this project is configured as follows:
+The Azure Container Registry created for this project has the following configuration:
 
 * **Registry Name:** `learnacrolamc`
-* **SKU:** `Basic`
-* **Region:** `West Europe`
-* **Login Server:** `learnacrolamc.azurecr.io`
+* **Pricing Tier (SKU):** `Basic`
+* **Deployment Region:** `West Europe`
+* **Registry Endpoint:** `learnacrolamc.azurecr.io`
 * **Resource Group:** `acr-learning-rg`
 
 ---
 
 ## 2. Dockerfile
 
-The application container is built using a lightweight, production-ready Python image. The Dockerfile configuration is shown below:
+The application is packaged into a container using a lightweight Python runtime image optimized for production environments. The Dockerfile performs the following operations:
+
+* Uses Python 3.11 Slim as the base image.
+* Creates `/app` as the working directory.
+* Copies dependency definitions into the container.
+* Installs all required packages.
+* Transfers the application source code.
+* Exposes port 80 for inbound traffic.
+* Sets production environment variables.
+* Starts the application using Gunicorn.
 
 ```dockerfile
 # Use the official Python 3.11 slim image as the base image
 FROM python:3.11-slim
 
-# Set the application's working directory
+# Configure the working directory
 WORKDIR /app
 
-# Copy the dependency file to the container
+# Copy dependency definitions
 COPY requirements.txt ./
 
-# Install required Python packages
+# Install required dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application source files into the container
+# Copy application files
 COPY . .
 
-# Expose port 80 for external access
+# Expose application port
 EXPOSE 80
 
 # Configure environment variables
@@ -63,46 +72,46 @@ CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:app"]
 
 ---
 
-## 3. Step-by-Step Execution Guide
+## 3. Deployment Procedure
 
-### Step 3.1: Install and Start Docker
+### Step 1: Install Docker Desktop
 
-Install Docker Desktop using the following command:
+Install Docker Desktop using the command below:
 
 ```powershell
 winget install Docker.DockerDesktop
 ```
 
-After installation, launch Docker Desktop to start the Docker Engine.
+Once installation is complete, start Docker Desktop to initialize the Docker Engine.
 
-### Step 3.2: Authenticate with Azure and ACR
+### Step 2: Authenticate with Azure
 
-Sign in to Azure and authenticate with the Azure Container Registry:
+Sign in to Azure and authenticate against Azure Container Registry:
 
 ```bash
 az login
 az acr login --name learnacrolamc
 ```
 
-### Step 3.3: Build and Tag the Docker Image
+### Step 3: Build the Container Image
 
-Build the Docker image and assign a version tag:
+Build the Docker image and assign the desired version tag:
 
 ```bash
 docker build -t learnacrolamc.azurecr.io/flask-acr-app:v4.0 .
 ```
 
-### Step 3.4: Push the Image to Azure Container Registry
+### Step 4: Upload the Image to ACR
 
-Upload the image to the registry:
+Push the image to Azure Container Registry:
 
 ```bash
 docker push learnacrolamc.azurecr.io/flask-acr-app:v4.0
 ```
 
-### Step 3.5: Deploy to Azure Container Instances (ACI)
+### Step 5: Deploy the Image to Azure Container Instances
 
-Deploy the image to Azure Container Instances:
+Deploy the uploaded image as a container instance in Azure:
 
 ```bash
 az container create \
@@ -118,97 +127,76 @@ az container create \
     --memory 1
 ```
 
-> **Security Note:** Never expose registry passwords or credentials in public repositories. Replace sensitive values with placeholders before publishing.
-
 ---
 
-## 3. Deployment Verification
+## 4. Deployment Verification
 
-### 3.1 Successful Docker Push Operation
+### Docker Push Confirmation
 
-The following terminal output confirms the successful upload of the container image to Azure Container Registry:
+The successful completion of the `docker push` command confirms that the container image was uploaded to Azure Container Registry and registered under the `v4.0` tag.
 
-```bash
-$ docker push learnacrolamc.azurecr.io/flask-acr-app:v4.0
-The push refers to repository [learnacrolamc.azurecr.io/flask-acr-app]
-e469e6eefeed: Layer already exists
-487df0b4910c: Layer already exists
-96507990deda: Layer already exists
-797d495f2c68: Layer already exists
-45006ceeeea9: Layer already exists
-5b4d6ff92fc4: Layer already exists
-8649771fee17: Layer already exists
-0d4d18d698db: Pushed
-3779c1115654: Pushed
-v4.0: digest: sha256:bc455006edbdfaab9d147ce7009cb353dcaec723fb820d443134e70a18c877d7 size: 856
-```
+### Registry Verification
 
-### 3.2 Azure Container Registry Verification
-
-Add a screenshot of the Azure Container Registry repository view to verify that the image exists in the registry.
+A screenshot of the Azure Container Registry repository should be included to verify the presence of the uploaded image.
 
 ```text
 screenshots/azure_acr_portal.png
 ```
 
-![Azure Container Registry Repository View](screenshots/azure_acr_portal.png)
-
 ---
 
-## 4. Proof of Execution
+## 5. Proof of Execution
 
-### 4.1 Running Application URL
+### Live Application Endpoint
 
-The deployed application is accessible through Azure Container Instances at:
+The application has been successfully deployed to Azure Container Instances and is accessible through the following URL:
 
 **http://flaskacrdemo2026leye.westeurope.azurecontainer.io**
 
-### 4.2 Running Application Screenshot
+### Running Application Evidence
 
-Add a screenshot demonstrating that the application is running successfully.
+Include a screenshot of the running application to demonstrate successful deployment and accessibility.
 
 ```text
 screenshots/web_app_live.png
 ```
 
-![Running Web Application](screenshots/web_app_live.png)
-
 ---
 
-## 5. Documentation
+## 6. Documentation
 
-### 5.1 Container Image Tagging Strategy
+### Image Versioning Strategy
 
-This project follows a semantic versioning approach for image management:
+A semantic versioning approach was adopted to manage container image releases.
 
-* **v1.0 – v3.0:** Development, testing, and validation releases.
-* **v4.0:** Production-ready release containing the completed Flask dashboard application.
+* **v1.0 – v3.0:** Development and testing releases.
+* **v4.0:** Stable production deployment containing the completed Flask application.
 
-#### Benefits
+#### Benefits of the Strategy
 
-1. **Immutability** – Released versions remain unchanged after deployment.
-2. **Version Control** – Eliminates the risks associated with mutable tags such as `latest`.
-3. **Traceability** – Every deployed image can be mapped to a specific build and source code version.
-4. **Rollback Support** – Previous stable versions can be redeployed quickly if needed.
+* **Consistency:** Released versions remain unchanged after deployment.
+* **Traceability:** Each deployment can be linked to a specific build version.
+* **Simplified Rollbacks:** Previous versions can be redeployed when necessary.
+* **Controlled Releases:** Avoids risks associated with mutable tags such as `latest`.
 
-### 5.2 Azure RBAC Roles
+### Azure RBAC Roles and Permissions
 
-The following Azure Role-Based Access Control (RBAC) roles are used to implement the principle of least privilege:
+To maintain security and enforce least-privilege access, the following Azure RBAC roles were utilized:
 
 #### AcrPull
 
-Assigned to Azure Container Instances (ACI) or other deployment targets. This role allows services to pull container images without permissions to modify or delete registry content.
+Allows deployment services such as Azure Container Instances to download container images without modification permissions.
 
 #### AcrPush
 
-Assigned to deployment service principals and CI/CD pipelines. This role allows users and services to push new images and manage repositories while restricting administrative actions.
+Enables CI/CD pipelines and deployment identities to upload and manage container images while restricting administrative access.
 
 #### Owner / Contributor
 
-Assigned to administrators responsible for registry provisioning, configuration management, SKU changes, and access control.
+Provides administrative permissions for registry management, resource provisioning, access control, and configuration updates.
 
 ---
 
-## Conclusion
+## Project Summary
 
-This project demonstrates the complete lifecycle of container image management using Azure Container Registry, including image creation, versioning, registry authentication, image deployment, verification, and secure access management through Azure RBAC.
+This project demonstrates the end-to-end process of container image management using Azure Container Registry, including image creation, version control, registry authentication, image deployment, validation, and secure access management through Azure RBAC.
