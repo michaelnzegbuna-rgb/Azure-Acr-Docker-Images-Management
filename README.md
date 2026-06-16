@@ -20,10 +20,10 @@ To support the evaluation process, the table below maps each assessment requirem
 
 ## 1. Registry Configuration
 
-* **Registry Name:** `learnacrolamc`
+* **Registry Name:** `learnacrnze`
 * **Service Tier (SKU):** `Basic`
 * **Deployment Region:** `West Europe`
-* **Registry Endpoint:** `learnacrolamc.azurecr.io`
+* **Registry Endpoint:** `learnacrnze.azurecr.io`
 * **Resource Group:** `acr-learning-rg`
 
 ---
@@ -77,7 +77,7 @@ Authenticate with Azure and connect to Azure Container Registry:
 
 ```bash
 az login
-az acr login --name learnacrolamc
+az acr login --name learnacrnze
 ```
 
 ### 3.3 Container Image Creation
@@ -85,7 +85,7 @@ az acr login --name learnacrolamc
 Build and tag the Docker image:
 
 ```bash
-docker build -t learnacrolamc.azurecr.io/flask-acr-app:v4.0 .
+docker build -t learnacrnze.azurecr.io/flask-acr-app:v4.0 .
 ```
 
 ### 3.4 Container Image Publication
@@ -104,10 +104,10 @@ Deploy the container image to Azure Container Instances:
 az container create \
     --resource-group acr-learning-rg \
     --name flask-acr-demo \
-    --image learnacrolamc.azurecr.io/flask-acr-app:v4.0 \
-    --dns-name-label flaskacrdemo2026leye \
+    --image learnacrnze.azurecr.io/flask-acr-app:v4.0 \
+    --dns-name-label flaskacrdemo2026nze \
     --ports 80 \
-    --registry-username learnacrolamc \
+    --registry-username learnacrnze \
     --registry-password "<registry-password>" \
     --os-type Linux \
     --cpu 1 \
@@ -123,7 +123,7 @@ az container create \
 The following output confirms the successful publication of the Docker image to Azure Container Registry.
 
 ```bash
-docker push learnacrolamc.azurecr.io/flask-acr-app:v4.0
+docker push learnacrnze.azurecr.io/flask-acr-app:v4.0
 ```
 
 ### 4.2 Azure Container Registry Verification
