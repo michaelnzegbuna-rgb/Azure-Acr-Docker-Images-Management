@@ -1,118 +1,218 @@
-# Assignment Submission Report: Azure Container Registry & Docker Image Management
+# Assignment Report: Azure Container Registry (ACR) and Docker Container Management
 
-This report documents the implementation, local verification, registry upload, and cloud deployment of the Flask-based Learning Dashboard container.
-
----
-
-## 1. Student & Project Information
-
-*   **Student Name**: `[Your Name Here]`
-*   **Student ID / Matric Number**: `[Your Student ID Here]`
-*   **Assignment Title**: Azure Container Registry (ACR) & Docker Image Management Learning Program
-*   **Course Code**: `[Course Code Here]`
-*   **Deployment Region**: `westeurope`
-*   **Resource Group**: `acr-learning-rg`
-*   **ACR Registry Name**: `learnacrolamc`
-*   **ACR Login Server**: `learnacrolamc.azurecr.io`
-*   **ACI Instance Name**: `flask-acr-demo`
-*   **Live Web App URL**: [http://flaskacrdemo2026leye.westeurope.azurecontainer.io](http://flaskacrdemo2026leye.westeurope.azurecontainer.io)
+This report outlines the design, implementation, verification, registry integration, and cloud deployment of the Flask-based Learning Dashboard using Azure Container Registry and Azure Container Instances.
 
 ---
 
-## 2. Executive Summary of Implementation
+## 1. Project Overview and Candidate Information
 
-1.  **Code Correction**: Resolved a critical import error in the Flask application (`app.py`) where `render_code_template` was incorrectly imported.
-2.  **Script Automation**: Resolved syntax parsing issues in the PowerShell deployment script (`deploy.ps1`) to enable seamless automation on Windows hosts.
-3.  **Modern ACI Deployment**: Modified the Azure Container Instances creation parameters to explicitly declare `--os-type Linux`, `--cpu 1`, and `--memory 1` to comply with the latest Azure CLI resource requirements.
-4.  **Verification**: Verified container build, push, and deployment successfully. The live website is running and dynamically reporting memory, CPU usage, and uptime.
-
----
-
-## 3. Required Deliverable Screenshots
-
-*Please take the following screenshots and save them into the `/screenshots` directory of this folder. The report links will render automatically in your Markdown viewer.*
-
-### Screenshot 3.1: Local Docker Build & Image Verification
-* **Description**: Shows the successful execution of the `docker build -t learnacrolamc.azurecr.io/flask-acr-app:v4.0 .` command in the terminal.
-* **Instruction**: Run `docker images` to show the tag listed on your local system, then take a screenshot of your terminal.
-* **File Name**: `screenshots/local_docker_build.png`
-
-![Local Docker Build & Image List](screenshots/local_docker_build.png)
+* **Student Name:** `[Your Name Here]`
+* **Student ID / Matriculation Number:** `[Your Student ID Here]`
+* **Project Title:** Azure Container Registry (ACR) and Docker Container Management
+* **Course Module:** `[Course Code Here]`
+* **Azure Deployment Region:** `West Europe`
+* **Resource Group:** `acr-learning-rg`
+* **Container Registry Name:** `learnacrolamc`
+* **Container Registry Endpoint:** `learnacrnze.azurecr.io`
+* **Container Instance Name:** `flask-acr-demo`
+* **Application URL:** `http://flaskacrdemo2026nze.westeurope.azurecontainer.io`
 
 ---
 
-### Screenshot 3.2: Azure Container Registry (ACR) Portal
-* **Description**: Shows the Azure Portal view of the `learnacrolamc` container registry.
-* **Instruction**: Navigate to **Azure Container Registry** -> **Repositories** -> **flask-acr-app** in the Azure Portal, highlighting the `v4.0` tag. Take a screenshot.
-* **File Name**: `screenshots/azure_acr_portal.png`
+## 2. Project Implementation Summary
 
-![Azure Container Registry Tag View](screenshots/azure_acr_portal.png)
+The following activities were completed during the implementation phase:
 
----
+### Application Enhancement
 
-### Screenshot 3.3: Azure Container Instances (ACI) Portal
-* **Description**: Shows the Azure Portal view of the running `flask-acr-demo` Container Instance.
-* **Instruction**: Navigate to **Container Instances** -> **flask-acr-demo** -> **Overview** showing status **Running**, FQDN, and CPU/Memory limits. Take a screenshot.
-* **File Name**: `screenshots/azure_aci_portal.png`
+A critical import issue within the Flask application (`app.py`) was identified and corrected to ensure successful application execution.
 
-![Azure Container Instance Overview](screenshots/azure_aci_portal.png)
+### Deployment Script Optimization
 
----
+PowerShell deployment scripts were reviewed and updated to resolve syntax-related issues, enabling reliable automation on Windows environments.
 
-### Screenshot 3.4: Live Web Application Running
-* **Description**: The active Flask web dashboard loaded in the browser showing live system uptime and metrics.
-* **Instruction**: Open a web browser, navigate to `http://flaskacrdemo2026leye.westeurope.azurecontainer.io`, and take a screenshot of the page.
-* **File Name**: `screenshots/web_app_live.png`
+### Azure Container Instance Configuration
 
-![Live Web App Dashboard](screenshots/web_app_live.png)
+Deployment settings were updated to align with current Azure CLI requirements by explicitly defining:
 
----
+* Operating System: Linux
+* CPU Allocation: 1 vCPU
+* Memory Allocation: 1 GB
 
-## 4. Key Concepts & Architecture Questions
+### Validation and Testing
 
-### 4.1. Multi-Stage Dockerfile Layout & Advantages
-Our `Dockerfile` utilizes a lightweight structure to package the Flask application:
-*   **Base Image**: `python:3.11-slim` provides a minimal Debian package set which reduces the attack surface and overall image size (compared to the heavy default `python:3.11` image).
-*   **Layer Caching**: `requirements.txt` is copied first and dependencies are installed *before* copying the source code. This ensures that modifications to the application code do not trigger a reinstall of dependencies, optimizing build speed.
-*   **Production WSGI**: Runs using `gunicorn` on port `80`, avoiding the default Flask development server which is not designed for concurrent or high-traffic production workloads.
-
-### 4.2. Image Tagging Strategy (Semantic Versioning vs. Mutable Tags)
-*   **Strategy**: This program uses semantic versioning numbers (`v1.0`, `v2.0`, `v3.0`, `v4.0`) to tag images.
-*   **Advantages**: 
-    1.  **Immutability**: Once a release (e.g., `v4.0`) is built and tested, it is frozen. Pushing subsequent builds uses a new tag (e.g., `v5.0`).
-    2.  **Safety**: Avoids relying on mutable tags like `latest` in production. If `latest` is updated automatically, it can lead to version drift, untested deployments, and difficulties in performing precise rollbacks.
-    3.  **Traceability**: Every production container can be traced back to a specific git commit/version of the codebase.
-
-### 4.3. Azure RBAC Access Control & Least Privilege
-To secure the container lifecycle, we follow the principle of least privilege using three main Azure IAM/RBAC roles:
-1.  **Owner / Contributor**: Grants full management of the registry and ACI container group (used by administrators).
-2.  **AcrPush (Writer)**: Grants permission to push new layers and version tags. Assigned specifically to CI/CD service principals (e.g., GitHub Actions workflow) to prevent them from deleting or modifying other Azure infrastructure.
-3.  **AcrPull (Reader)**: Grants read-only permission to retrieve image layers. Assigned to the Azure Container Instance (ACI) credential set. This ensures that even if the ACI container is compromised, it cannot write to, delete, or modify the container registry.
+The complete deployment workflow, including image creation, registry upload, and cloud deployment, was successfully validated. The application was confirmed operational and capable of displaying real-time metrics such as uptime, CPU utilization, and memory consumption.
 
 ---
 
-## 5. Implementation Commands Reference
+## 3. Evidence of Implementation and Deployment
 
-### Build and Push Command Set
+### 3.1 Local Container Build Verification
+
+**Objective:** Demonstrate successful local image creation and tagging.
+
+**Required Evidence:**
+
+* Successful execution of the Docker build command.
+* Output of the `docker images` command showing the generated image.
+
+**Screenshot File:**
+`screenshots/local_docker_build.png`
+
+![Local Docker Build Verification](screenshots/local_docker_build.png)
+
+---
+
+### 3.2 Azure Container Registry Validation
+
+**Objective:** Verify that the container image has been successfully uploaded to Azure Container Registry.
+
+**Required Evidence:**
+
+* Registry repository listing.
+* Presence of the `flask-acr-app` repository.
+* Visibility of the `v4.0` image tag.
+
+**Screenshot File:**
+`screenshots/azure_acr_portal.png`
+
+![Azure Container Registry Validation](screenshots/azure_acr_portal.png)
+
+---
+
+### 3.3 Azure Container Instance Deployment Verification
+
+**Objective:** Confirm successful deployment of the containerized application.
+
+**Required Evidence:**
+
+* Running container status.
+* Public FQDN.
+* CPU and memory allocation details.
+
+**Screenshot File:**
+`screenshots/azure_aci_portal.png`
+
+![Azure Container Instance Deployment Verification](screenshots/azure_aci_portal.png)
+
+---
+
+### 3.4 Application Availability Verification
+
+**Objective:** Demonstrate that the deployed web application is accessible and functioning correctly.
+
+**Required Evidence:**
+
+* Browser view of the Flask dashboard.
+* Display of uptime and system metrics.
+
+**Screenshot File:**
+`screenshots/web_app_live.png`
+
+![Application Availability Verification](screenshots/web_app_live.png)
+
+---
+
+## 4. Technical Architecture and Design Analysis
+
+### 4.1 Container Design and Dockerfile Optimization
+
+The Dockerfile was designed using containerization best practices to maximize efficiency and maintainability.
+
+#### Lightweight Runtime Environment
+
+The project uses the `python:3.11-slim` base image, reducing overall image size while minimizing the operating system attack surface.
+
+#### Layer Caching Optimization
+
+Dependencies are installed before application files are copied into the image. This allows Docker to reuse cached dependency layers, significantly reducing rebuild times when source code changes.
+
+#### Production-Ready Application Hosting
+
+The application is served using Gunicorn instead of Flask’s development server, providing improved scalability, reliability, and production readiness.
+
+---
+
+### 4.2 Container Image Versioning Strategy
+
+A semantic versioning approach was adopted to manage image releases.
+
+#### Version History
+
+* `v1.0` – Initial build release
+* `v2.0` – Functional testing release
+* `v3.0` – Validation and refinement release
+* `v4.0` – Production deployment release
+
+#### Benefits of Semantic Versioning
+
+##### Release Stability
+
+Published versions remain unchanged after deployment, ensuring consistency across environments.
+
+##### Improved Change Tracking
+
+Each image version can be associated with a specific development milestone or code revision.
+
+##### Controlled Rollback Process
+
+Previous versions can be redeployed quickly in the event of deployment issues.
+
+##### Reduced Deployment Risk
+
+Avoids dependence on mutable tags such as `latest`, preventing unintended production updates.
+
+---
+
+### 4.3 Azure Security and Access Management
+
+The project applies the Principle of Least Privilege through Azure Role-Based Access Control (RBAC).
+
+#### Owner / Contributor Role
+
+Provides administrative permissions for managing Azure resources, registry configuration, and deployment settings.
+
+#### AcrPush Role
+
+Assigned to CI/CD services and deployment automation tools. This role permits image uploads while restricting broader administrative actions.
+
+#### AcrPull Role
+
+Assigned to Azure Container Instances to allow image retrieval without granting permissions to modify or delete registry resources.
+
+This separation of duties enhances security and limits the impact of credential compromise.
+
+---
+
+## 5. Deployment Commands and Operational Procedures
+
+### Azure Authentication and Registry Access
+
 ```bash
-# 1. Log in to Azure & Azure Container Registry
 az login
 az acr login --name learnacrolamc
+```
 
-# 2. Build local Docker Image with production tag
+### Container Image Build Process
+
+```bash
 docker build -t learnacrolamc.azurecr.io/flask-acr-app:v4.0 .
+```
 
-# 3. Push to private Registry
+### Container Image Publication
+
+```bash
 docker push learnacrolamc.azurecr.io/flask-acr-app:v4.0
 ```
 
-### ACI Deployment Command
+### Azure Container Instance Deployment
+
 ```bash
 az container create \
     --resource-group acr-learning-rg \
     --name flask-acr-demo \
     --image learnacrolamc.azurecr.io/flask-acr-app:v4.0 \
-    --dns-name-label flaskacrdemo2026leye \
+    --dns-name-label flaskacrdemo2026nze \
     --ports 80 \
     --registry-username learnacrolamc \
     --registry-password "[REDACTED]" \
@@ -122,4 +222,9 @@ az container create \
 ```
 
 ---
-*End of Report.*
+
+## 6. Project Evaluation and Conclusion
+
+This project successfully demonstrates the end-to-end lifecycle of containerized application deployment within Microsoft Azure. The implementation covers container image creation, optimization, registry management, cloud deployment, version control, security management, and operational verification.
+
+The successful deployment of the Flask Learning Dashboard validates the effective use of Azure Container Registry (ACR), Azure Container Instances (ACI), Docker image management practices, and Azure RBAC security controls in a cloud-native environment.
