@@ -1,6 +1,16 @@
-Place your screenshots in this folder.
-Recommended screenshots:
-1. local_docker_build.png - Screenshot of a successful local docker build.
-2. azure_acr_portal.png - Screenshot of the Azure Portal showing the 'learnacrolamc' container registry repositories and the 'v4.0' tag.
-3. azure_aci_portal.png - Screenshot of the Azure Portal showing the 'flask-acr-demo' Container Instance running with status 'Running' and public FQDN.
-4. web_app_live.png - Screenshot of the live web app dashboard running in the browser at the public URL.
+# Screenshot Evidence Directory
+
+Store all verification screenshots in this folder as supporting evidence for the deployment and validation process.
+
+### Required Screenshot Files
+
+| Screenshot File            | Description                                                                                                                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **local_docker_build.png** | Capture showing the successful completion of the Docker image build process on the local machine.                                                                                |
+| **azure_acr_portal.png**   | Azure Portal view displaying the Azure Container Registry (`learnacrolamc`), including the repository and the published image tag (`v4.0`).                                      |
+| **azure_aci_portal.png**   | Azure Portal screenshot showing the deployed Container Instance (`flask-acr-demo`) in a **Running** state, together with its assigned public Fully Qualified Domain Name (FQDN). |
+| **web_app_live.png**       | Browser screenshot confirming that the deployed web application is accessible and functioning correctly through its public endpoint.                                             |
+
+### Purpose of the Screenshots
+
+These images provide visual confirmation of each stage of the deployment lifecycle, including image creation, registry publication, container execution, and application accessibility. The screenshots serve as evidence that the solution was successfully deployed and validated within the Azure cloud environment.
