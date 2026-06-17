@@ -1,116 +1,126 @@
-# Azure Container Registry and Container Deployment Implementation Report
+# Containerized Application Deployment on Microsoft Azure: Registry, Image Publishing, and Service Validation
 
-## Overview
+## Project Background
 
-This repository contains the resources, configuration files, deployment commands, and supporting evidence used to implement a containerized application on Microsoft Azure. The project demonstrates how Docker images can be created, stored within Azure Container Registry (ACR), and deployed to Azure Container Instances (ACI) for public access.
-
----
-
-# Deliverables Traceability Matrix
-
-The following table links each assessment requirement to the corresponding section of this repository.
-
-| Assessment Component         | Evidence Provided                               | Section Reference                   |
-| ---------------------------- | ----------------------------------------------- | ----------------------------------- |
-| Registry Deployment          | Azure Container Registry configuration details  | Container Registry Details          |
-| Image Build Process          | Docker image definition and build instructions  | Application Container Configuration |
-| Registry Upload Verification | Confirmation of image storage within ACR        | Registry Validation                 |
-| Running Service Validation   | Evidence of successful application deployment   | Application Accessibility Check     |
-| Administrative Documentation | Version control and access management practices | Governance and Operations           |
+This repository documents the implementation of a cloud-based container deployment solution using Microsoft Azure services. The project includes application containerization with Docker, image storage within Azure Container Registry (ACR), deployment through Azure Container Instances (ACI), and verification of successful service execution.
 
 ---
 
-# 1. Container Registry Details
+# Requirement Coverage Summary
 
-To support centralized image management, an Azure Container Registry service was provisioned with the following specifications:
+The following matrix demonstrates how each project objective has been addressed within the repository.
 
-| Configuration Item | Value                       |
-| ------------------ | --------------------------- |
-| Registry Name      | learnacrnzemikez            |
-| Service Plan       | Basic                       |
-| Azure Region       | West Europe                 |
-| Login Server       | learnacrnzemikez.azurecr.io |
-| Resource Group     | acr-learning-rg             |
-
-The registry acts as the primary repository for storing and distributing application container images throughout the deployment lifecycle.
+| Project Requirement              | Supporting Evidence                               | Repository Location                 |
+| -------------------------------- | ------------------------------------------------- | ----------------------------------- |
+| Container Registry Setup         | Registry creation and configuration details       | Cloud Registry Environment          |
+| Image Packaging Process          | Docker image build instructions and configuration | Application Packaging Specification |
+| Image Upload Confirmation        | Verification of successful image publication      | Registry Storage Verification       |
+| Service Deployment Evidence      | Proof of active application availability          | Service Accessibility Assessment    |
+| Governance and Security Controls | Version tracking and permission management        | Management and Security Practices   |
 
 ---
 
-# 2. Application Container Configuration
+# Cloud Registry Environment
 
-The application is packaged using Docker and executed within a lightweight Python environment designed for cloud-native workloads.
+A dedicated Azure Container Registry was established to provide centralized storage and management for container images used throughout the deployment process.
+
+### Registry Properties
+
+| Parameter           | Configuration               |
+| ------------------- | --------------------------- |
+| Registry Identifier | learnacrnzemikez            |
+| Service Level       | Basic                       |
+| Hosting Location    | West Europe                 |
+| Registry Address    | learnacrnzemikez.azurecr.io |
+| Resource Collection | acr-learning-rg             |
+
+The registry serves as the primary image repository and facilitates secure integration with Azure deployment services.
+
+---
+
+# Application Packaging Specification
+
+To ensure portability and consistency across environments, the application was encapsulated within a Docker container based on a streamlined Python runtime image.
 
 ```dockerfile
+# Base runtime image
 FROM python:3.11-slim
 
+# Define application directory
 WORKDIR /app
 
+# Transfer dependency file
 COPY requirements.txt ./
 
+# Install required packages
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Transfer source code
 COPY . .
 
+# Open network port
 EXPOSE 80
 
+# Configure runtime settings
 ENV FLASK_ENV=production
 ENV PORT=80
 
+# Start web service
 CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:app"]
 ```
 
-## Container Configuration Summary
+### Packaging Workflow
 
-The Dockerfile performs the following actions:
+The configuration above accomplishes the following:
 
-* Downloads a minimal Python runtime image.
-* Creates an application workspace within the container.
-* Installs project dependencies from the requirements file.
-* Transfers application source code into the image.
-* Opens network port 80 for incoming traffic.
-* Defines production-specific environment variables.
-* Starts the application using the Gunicorn web server.
+* Utilizes a lightweight Python operating environment.
+* Creates a dedicated workspace inside the container.
+* Installs all required application dependencies.
+* Copies project files into the image.
+* Enables external access through port 80.
+* Defines production runtime variables.
+* Executes the application through Gunicorn.
 
 ---
 
-# 3. Build and Release Workflow
+# Build and Release Activities
 
-## Docker Installation
+## Local Container Platform Installation
 
-Docker Desktop was installed to provide local containerization capabilities.
+Docker Desktop was installed to support image creation and testing on the local workstation.
 
 ```powershell
 winget install Docker.DockerDesktop
 ```
 
-## Azure Authentication
+## Authentication and Registry Connectivity
 
-The Azure CLI was used to authenticate and establish access to the container registry.
+Access to Azure services and the container registry was established through Azure CLI authentication.
 
 ```bash
 az login
 az acr login --name learnacrnzemikez
 ```
 
-## Image Build Procedure
+## Image Generation
 
-The application image was built locally and assigned a version identifier.
+The application image was created locally and assigned a release tag for identification.
 
 ```bash
 docker build -t learnacrnzemikez.azurecr.io/flask-acr-app:v4.0 .
 ```
 
-## Publishing the Image
+## Registry Upload Operation
 
-Once the build completed successfully, the image was uploaded to Azure Container Registry.
+Following image creation, the artifact was uploaded to Azure Container Registry.
 
 ```bash
 docker push learnacrnzemikez.azurecr.io/flask-acr-app:v4.0
 ```
 
-## Deploying to Azure Container Instances
+## Container Service Provisioning
 
-The container image was deployed as a managed Azure Container Instance using the following command:
+The published image was deployed to Azure Container Instances to provide a publicly accessible service.
 
 ```bash
 az container create \
@@ -128,93 +138,91 @@ az container create \
 
 ---
 
-# 4. Registry Validation
+# Registry Storage Verification
 
-## Image Publication Confirmation
+## Upload Confirmation
 
-Successful execution of the image upload process verified that the container artifact was stored within Azure Container Registry and became available for deployment.
+Successful execution of the image publication command confirmed that the container artifact was stored within the Azure Container Registry environment.
 
-## Registry Repository Evidence
+## Repository Evidence
 
-The screenshot below provides proof that the repository and image version were successfully created within Azure Container Registry.
+The screenshot below demonstrates that the repository and associated version tag are visible within the Azure Portal.
 
 ```text
 screenshots/azure_acr_portal.png
 ```
 
-The image tag `v4.0` should be visible within the repository listing.
+The repository listing should display the published image version `v4.0`.
 
 ---
 
-# 5. Application Accessibility Check
+# Service Accessibility Assessment
 
-## Service Endpoint
+## Public Service Address
 
-Following deployment, Azure assigned a public endpoint through which the application can be accessed.
+Upon successful deployment, Azure generated a public endpoint through which the application can be accessed.
 
-```text
-http://flaskacrdemo2026leye.westeurope.azurecontainer.io
-```
+**http://flaskacrdemo2026leye.westeurope.azurecontainer.io**
 
-## Runtime Verification
+## Application Availability Proof
 
-Application functionality was verified by accessing the public URL through a web browser and confirming that the service responded successfully.
+The following screenshot confirms that the web application is operational and responding successfully through its public URL.
 
 ```text
 screenshots/web_app_live.png
 ```
 
-This screenshot serves as evidence that the deployed container instance is operating correctly.
+This evidence verifies that the container instance was deployed correctly and remains accessible.
 
 ---
 
-# 6. Governance and Operations
+# Management and Security Practices
 
-## Container Release Management
+## Release Identification Strategy
 
-A structured image-tagging strategy was adopted to manage application releases throughout development and deployment activities.
+A version-tagging methodology was implemented to maintain consistency across development, testing, and production deployments.
 
-### Release Record
+### Release Catalogue
 
-| Version     | Purpose                            |
-| ----------- | ---------------------------------- |
-| v1.0 – v3.0 | Development and testing iterations |
-| v4.0        | Approved production release        |
+| Image Version | Deployment Purpose                 |
+| ------------- | ---------------------------------- |
+| v1.0 – v3.0   | Experimental and validation builds |
+| v4.0          | Final production deployment        |
 
-### Advantages
+### Operational Advantages
 
-* Simplifies deployment tracking.
-* Supports controlled rollback procedures.
-* Prevents accidental overwriting of stable releases.
-* Enhances auditability and change management.
+* Supports accurate release tracking.
+* Simplifies rollback procedures when necessary.
+* Protects production versions from accidental modification.
+* Improves audit and change-management processes.
 
 ---
 
-## Access Control Implementation
+## Permission Governance Framework
 
-Azure Role-Based Access Control (RBAC) was configured to regulate permissions and secure registry operations.
+Azure Role-Based Access Control (RBAC) was configured to ensure that registry operations adhere to the principle of least privilege.
 
-### AcrPull
+### Image Retrieval Permissions
 
-Allows users and services to download container images without granting modification rights.
+The AcrPull role grants read-only access for workloads and users that require container images without modification capabilities.
 
-### AcrPush
+### Image Publishing Permissions
 
-Provides permission to upload, update, and manage container images within the registry.
+The AcrPush role allows authorized deployment accounts to upload, update, and maintain container images within the registry.
 
-### Owner and Contributor
+### Administrative Permissions
 
-Grants administrative capabilities required for resource provisioning, service configuration, and access management.
+Owner and Contributor roles provide elevated access for resource administration, service configuration, and governance activities.
 
-### Security Benefits
+### Security Outcomes
 
-* Enforces least-privilege access principles.
-* Protects registry resources from unauthorized modifications.
+* Restricts unauthorized changes to registry resources.
+* Minimizes security risks through controlled access.
 * Supports secure deployment automation.
-* Improves governance across the Azure environment.
+* Enhances operational governance across Azure resources.
 
 ---
 
-# Summary
+# Final Remarks
 
-The project successfully demonstrates an end-to-end container deployment workflow using Azure services. Activities completed include image creation with Docker, image storage in Azure Container Registry, deployment to Azure Container Instances, application validation through a public endpoint, and implementation of security controls using Azure RBAC. The accompanying screenshots and deployment evidence confirm the successful execution of all required tasks.
+The successful completion of this project demonstrates practical knowledge of container lifecycle management within Microsoft Azure. Activities undertaken included image creation with Docker, image publication to Azure Container Registry, deployment through Azure Container Instances, validation of application availability, and implementation of access-control mechanisms to safeguard cloud resources. The supporting evidence confirms that all deployment objectives were completed successfully.
