@@ -22,10 +22,10 @@ The table below provides a clear mapping between the required assessment deliver
 
 The Azure Container Registry created for this project has the following configuration:
 
-* **Registry Name:** `learnacrolamc`
+* **Registry Name:** `learnacrnzemikez`
 * **Pricing Tier (SKU):** `Basic`
 * **Deployment Region:** `West Europe`
-* **Registry Endpoint:** `learnacrolamc.azurecr.io`
+* **Registry Endpoint:** `learnnzemikez.azurecr.io`
 * **Resource Group:** `acr-learning-rg`
 
 ---
@@ -79,7 +79,7 @@ Authenticate with Azure and connect to Azure Container Registry.
 
 ```bash
 az login
-az acr login --name learnacrolamc
+az acr login --name learnnzemikez
 ```
 
 ### Step 3: Container Image Creation
@@ -87,7 +87,7 @@ az acr login --name learnacrolamc
 Build the Docker image and assign a version tag.
 
 ```bash
-docker build -t learnacrolamc.azurecr.io/flask-acr-app:v4.0 .
+docker build -t learnacrnzemikez.azurecr.io/flask-acr-app:v4.0 .
 ```
 
 ### Step 4: Container Image Publication
